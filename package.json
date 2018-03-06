@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "tape tests/test-*js",
-    "build": "tsc -p ."
+    "build": "tsc -p . && browserify -s ind2sub -o ind2sub-browser.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/fasiha/ind2sub#readme",
   "devDependencies": {
+    "browserify": "^16.1.0",
     "tape": "^4.9.0",
     "typescript": "^2.7.2"
   }
