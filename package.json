@@ -1,0 +1,15 @@
+{
+  "name": "ind2sub",
+  "version": "1.0.0",
+  "description": "Convert a linear index into multi-dimensional array subscripts",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape tests/test-*js"
+  },
+  "keywords": [],
+  "author": "Ahmed Fasih",
+  "license": "Unlicense",
+  "devDependencies": {
+    "tape": "^4.9.0"
+  }
+}
