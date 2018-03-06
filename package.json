@@ -1,11 +1,11 @@
 {
   "name": "ind2sub",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Convert a linear index into multi-dimensional array subscripts",
   "main": "index.js",
   "scripts": {
     "test": "tape tests/test-*js",
-    "build": "tsc -p . && browserify -s ind2sub -o ind2sub-browser.js"
+    "build": "tsc -p . && browserify index.js -s ind2sub -o ind2sub-browser.js"
   },
   "repository": {
     "type": "git",
