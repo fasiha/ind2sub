@@ -35,9 +35,37 @@ Then any subsequently-loaded JavaScript code in your webapp can invoke this as
 ind2sub.ind2sub([2, 3, 4], 22); // `Array [ 0, 2, 3 ]` in Firefox
 ```
 
+## API
+
+### `ind2sub`
+```js
+// number[] -> number -> number[]
+ind2sub(sizes, index)
+```
+Given some conceptual `N`-dimensional array with sizes `sizes` (an `N`-element array), and a linear `index` into that array (in Fortran, column-major, order), this returns another `N`-element array of subscripts needed to reach that index. Examples were given above.
+
+### `optimizeInd2sub`
+```js
+// number[] -> (number -> number[])
+optimizeInd2sub(sizes)
+```
+A higher-order function. Given just the `N`-element `sizes` array from above, this returns another function, which takes one `index` argument, that in turn yields the final `N`-element subscripts array. This function will cache an intermediate array that depends on `sizes`, to speed up repeated calls to `ind2sub` for the same array `sizes`.
+
+Example, in Node.js:
+```js
+const { ind2sub, optimizeInd2sub } = require('ind2sub');
+const sizes = [ 2, 3, 4 ];
+const f = optimizeInd2sub(sizes);
+console.log(ind2sub(sizes, 5), f(5)) // [ 1, 2, 0 ], [ 1, 2, 0 ]
+console.log(ind2sub(sizes, 15), f(15)) // [ 1, 1, 2 ], [ 1, 1, 2 ]
+console.log(ind2sub(sizes, 22), f(22)) // [ 0, 2, 3 ], [ 0, 2, 3 ]
+```
+
+A loop over large `sizes` that uses the optimized function might be 10x faster than the equivalent loop with plain `ind2sub` calls.
+
 ## Development
 
-Add TypeScript code to `index.ts`. Run
+Add your TypeScript code to `index.ts`. Run
 ```
 $ npm test
 ```
@@ -52,3 +80,34 @@ To package it all up, run the following, which invokes `tsc`, the TypeScript com
 ```
 $ npm run build
 ```
+
+## How it works
+
+The mental image I have is a long linear chunk of memory: `0 1 2 3 4 5 6 7 8 9 10 11 …`.
+
+Now.
+
+If the first dimension, which varies the fastest in column-major/Fortran ordering, has size 2, then you can convince yourself pretty easily that the first subscript should be `linear index % 2`:
+
+| 0 | 1 |
+|---|---|
+| 0 | 1 |
+| 2 | 3 |
+| 4 | 5 |
+| ⋮ | ⋮ |
+
+Say the second dimension has size 3. This means that the second subscript increments only after iterating through 2-tuples in the linear array: the second subscript is:
+
+| 0   | 1   | 2   |
+|-----|-----|-----|
+| 0,1 | 2,3 | 4,5 |
+| 6,7 | 8,9 | 10,11 |
+| ⋮   | ⋮    | ⋮     |
+
+So the second subscript should be `(linear index) / 2 % 3`. Note here how each table cell contains two values (for each slice of the first dimension) while each cell in the first table (for the first dimension) had only one element (the "zeroth" dimension?).
+
+The third subscript increments after 2 * 3 elements of the linear array. Drawing the table above in your mind, you can see that the third subscript is `(linear index) / 6 % (size of third dimension)`.
+
+Basically the formula in pseudocode is `ind2sub(size, linear index)[dimension] = (linear index) / PROD(size.slice(0, dimension)) % size[dimension]`, where `PROD([]) = 1` and `PROD(arr) = arr[0] * arr[1] * ...`.
+
+That's basically the logic, encoded in two lines of TypeScript, that sits in the middle of this library.
