@@ -4,4 +4,4 @@ function ind2sub(sizes, index) {
     var cumprod = sizes.reduce(function (acc, n) { return acc.concat(acc[acc.length - 1] * n); }, [1]);
     return sizes.map(function (size, i) { return Math.floor(index / (cumprod[i])) % size; });
 }
-exports.default = ind2sub;
+exports.ind2sub = ind2sub;
