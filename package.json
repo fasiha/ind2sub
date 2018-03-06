@@ -4,12 +4,22 @@
   "description": "Convert a linear index into multi-dimensional array subscripts",
   "main": "index.js",
   "scripts": {
-    "test": "tape tests/test-*js"
+    "test": "tape tests/test-*js",
+    "build": "tsc -p ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fasiha/ind2sub.git"
   },
   "keywords": [],
   "author": "Ahmed Fasih",
   "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/fasiha/ind2sub/issues"
+  },
+  "homepage": "https://github.com/fasiha/ind2sub#readme",
   "devDependencies": {
-    "tape": "^4.9.0"
+    "tape": "^4.9.0",
+    "typescript": "^2.7.2"
   }
 }
